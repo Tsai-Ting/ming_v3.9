@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本對讀系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body { background-color: #f3f4f6; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+        .text-box { min-height: 500px; max-height: 80vh; overflow-y: auto; }
+    </style>
+</head>
+<body>
+
+<div id="app" class="h-screen flex flex-col">
+    <header class="bg-white shadow p-4 flex justify-between items-center z-10">
+        <h1 class="text-xl font-bold text-gray-800">文本對讀實驗</h1>
+        <div class="text-sm text-gray-500" v-if="loading">載入資料中...</div>
+        <div class="text-sm text-gray-500" v-else>
+            共 {{ mappings.length }} 筆基準資料
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        
+        <div class="w-64 bg-gray-50 border-r border-gray-200 overflow-y-auto p-2">
+            <h3 class="text-xs font-bold text-gray-400 uppercase mb-2 px-2">基準文本 ID</h3>
+            <ul>
+                <li v-for="(item, index) in mappings" :key="index">
+                    <button 
+                        @click="selectSource(item)"
+                        :class="['w-full text-left px-3 py-2 rounded text-sm mb-1', 
+                                 currentSource && currentSource.source === item.source ? 'bg-blue-600 text-white' : 'hover:bg-gray-200 text-gray-700']">
+                        {{ item.source }}
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="flex-1 flex p-4 gap-4 overflow-hidden" v-if="currentSource">
+            
+            <div class="flex-1 bg-white rounded-lg shadow flex flex-col">
+                <div class="p-3 border-b border-gray-100 bg-blue-50 rounded-t-lg">
+                    <span class="text-xs font-bold text-blue-600 uppercase">Source / 基準</span>
+                    <div class="font-bold text-lg">{{ currentSource.source }}</div>
+                </div>
+                <div class="p-6 text-lg leading-relaxed text-gray-800 text-box whitespace-pre-wrap">
+                    {{ getText(currentSource.source) }}
+                </div>
+            </div>
+
+            <div class="flex-1 bg-white rounded-lg shadow flex flex-col">
+                <div class="p-3 border-b border-gray-100 bg-green-50 rounded-t-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-green-600 uppercase">Target / 比對 ({{ currentSource.targets.length }} matches)</span>
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-2">
+                        <button 
+                            v-for="tid in currentSource.targets" 
+                            :key="tid"
+                            @click="currentTargetId = tid"
+                            :class="['px-3 py-1 rounded-full text-xs font-mono border whitespace-nowrap transition', 
+                                     currentTargetId === tid ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-600 border-gray-300 hover:border-green-400']">
+                            {{ tid }}
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6 text-lg leading-relaxed text-gray-800 text-box whitespace-pre-wrap">
+                    {{ getText(currentTargetId) }}
+                </div>
+            </div>
+        </div>
+
+        <div v-else class="flex-1 flex items-center justify-center text-gray-400">
+            請從左側選單選擇一個文本開始對讀
+        </div>
+    </div>
+</div>
+
+<script>
+    const { createApp } = Vue
+
+    createApp({
+        data() {
+            return {
+                loading: true,
+                mappings: [], // 存儲索引結構
+                corpus: {},   // 存儲文本內容
+                currentSource: null, // 目前選中的左側資料物件
+                currentTargetId: null // 目前選中的右側 ID
+            }
+        },
+        mounted() {
+            // 讀取 data.json
+            fetch('./data.json')
+                .then(response => response.json())
+                .then(data => {
+                    this.mappings = data.mappings;
+                    this.corpus = data.corpus;
+                    this.loading = false;
+                })
+                .catch(err => {
+                    console.error("讀取 json 失敗", err);
+                    alert("讀取 data.json 失敗，請確認檔案是否存在");
+                });
+        },
+        methods: {
+            selectSource(item) {
+                this.currentSource = item;
+                // 預設選中第一個匹配對象
+                if (item.targets && item.targets.length > 0) {
+                    this.currentTargetId = item.targets[0];
+                } else {
+                    this.currentTargetId = null;
+                }
+            },
+            getText(id) {
+                if (!id) return "(無 ID)";
+                return this.corpus[id] || "(資料庫中找不到此 ID 的內文)";
+            }
+        }
+    }).mount('#app')
+</script>
+
+</body>
+</html>
