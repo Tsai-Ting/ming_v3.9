@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文獻對讀系統 V3.3 (Modern UI)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>文獻對讀系統 V3.4 (Mobile Optimized)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
@@ -14,11 +14,11 @@
                 extend: {
                     fontFamily: {
                         sans: ['"Noto Sans TC"', 'sans-serif'],
-                        serif: ['"Noto Serif TC"', 'serif'], // 用於古文
+                        serif: ['"Noto Serif TC"', 'serif'],
                     },
                     colors: {
-                        primary: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' }, // Indigo
-                        secondary: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 900: '#134e4a' }, // Teal
+                        primary: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' },
+                        secondary: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 900: '#134e4a' },
                     }
                 }
             }
@@ -28,63 +28,75 @@
     <style>
         body { background-color: #f3f4f6; }
         
-        /* 自定義滾動條 - 更細緻優雅 */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        /* 手機版滾動優化 */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* 隱藏橫向滾動條但保留功能 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 古文閱讀優化 */
         .text-classical {
             font-family: "Noto Serif TC", serif;
-            font-size: 1.15rem;
-            line-height: 1.9;
+            font-size: 1.1rem; /* 手機版字體稍微調整 */
+            line-height: 1.8;
             text-align: justify;
             letter-spacing: 0.02em;
             color: #334155;
+        }
+
+        /* 手機版特定優化 */
+        @media (max-width: 768px) {
+            .text-classical { font-size: 1.05rem; line-height: 1.7; }
         }
     </style>
 </head>
 <body class="text-slate-600">
 
-<div id="app" class="h-screen flex flex-col overflow-hidden bg-gray-50">
+<div id="app" class="h-screen h-[100dvh] flex flex-col overflow-hidden bg-gray-50">
     
-    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200 h-16 flex items-center px-6 justify-between shrink-0 z-30 sticky top-0 shadow-sm">
-        <div class="flex items-center gap-4">
-            <div class="bg-gradient-to-br from-primary-600 to-primary-800 text-white p-2 rounded-lg shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+    <header class="bg-white/90 backdrop-blur-md border-b border-gray-200 h-14 md:h-16 flex items-center px-4 md:px-6 justify-between shrink-0 z-40 sticky top-0 shadow-sm">
+        <div class="flex items-center gap-3 md:gap-4">
+            <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 -ml-2 text-slate-500 hover:bg-gray-100 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
+            <div class="bg-gradient-to-br from-primary-600 to-primary-800 text-white p-1.5 md:p-2 rounded-lg shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             </div>
             <div>
-                <h1 class="text-lg font-bold text-slate-800 tracking-wide">壬辰戰爭對讀資料庫</h1>
-                <div class="text-[10px] text-slate-400 font-mono flex items-center gap-2">
+                <h1 class="text-base md:text-lg font-bold text-slate-800 tracking-wide">壬辰戰爭對讀</h1>
+                <div class="hidden md:block text-[10px] text-slate-400 font-mono flex items-center gap-2">
                     <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                    v3.3 Build · {{ mappings.length }} Records
+                    v3.4 Mobile
                 </div>
             </div>
         </div>
         
-        <div class="flex items-center gap-4 bg-gray-100/50 p-1.5 rounded-full border border-gray-200">
-             <label class="flex items-center cursor-pointer gap-2 text-xs font-medium text-slate-600 hover:text-primary-600 select-none px-3 py-1 transition-colors">
+        <div class="flex items-center gap-2 md:gap-4 bg-gray-100/50 p-1 md:p-1.5 rounded-full border border-gray-200">
+             <label class="hidden md:flex items-center cursor-pointer gap-2 text-xs font-medium text-slate-600 px-3 py-1">
                 <input type="checkbox" v-model="cleanMode" class="accent-primary-600 rounded">
                 <span>自動清理</span>
             </label>
-             <div class="h-4 w-px bg-gray-300"></div>
-             <label class="flex items-center cursor-pointer gap-2 text-xs font-medium text-slate-600 hover:text-primary-600 select-none px-3 py-1 transition-colors">
+             <label class="flex items-center cursor-pointer gap-2 text-xs font-medium text-slate-600 px-3 py-1">
                 <input type="checkbox" v-model="syncScroll" class="accent-primary-600 rounded">
-                <span>同步捲動</span>
+                <span class="whitespace-nowrap">同步</span>
             </label>
         </div>
     </header>
 
-    <div class="flex-1 flex overflow-hidden">
+    <div class="flex-1 flex overflow-hidden relative">
         
-        <aside class="w-80 bg-white border-r border-gray-200 flex flex-col shrink-0 z-20 shadow-[4px_0_24px_-12px_rgba(0,0,0,0.1)]">
-            <div class="p-4 border-b border-gray-100">
+        <div v-if="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-black/30 z-30 md:hidden transition-opacity"></div>
+
+        <aside :class="['absolute md:relative z-40 h-full w-72 md:w-80 bg-white border-r border-gray-200 flex flex-col shadow-2xl md:shadow-[4px_0_24px_-12px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out', sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0']">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">明實錄編年索引</h3>
+                <button @click="sidebarOpen = false" class="md:hidden text-slate-400 hover:text-slate-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
             </div>
             <div class="overflow-y-auto flex-1 p-3 space-y-4">
                 <ul v-if="!loading">
@@ -112,7 +124,7 @@
                                     </div>
                                     <div class="text-[10px] mt-1 font-mono opacity-60 flex justify-between">
                                         <span>{{ item.source }}</span>
-                                        <span v-if="item.targets.length" class="text-primary-600 font-bold">{{ item.targets.length }} matches</span>
+                                        <span v-if="item.targets.length" class="text-primary-600 font-bold">{{ item.targets.length }}</span>
                                     </div>
                                 </button>
                             </li>
@@ -127,109 +139,96 @@
 
         <main class="flex-1 flex flex-col min-w-0 bg-gray-50/50" v-if="currentSource">
             
-            <div class="bg-white border-b border-gray-200 px-4 py-3 shadow-sm z-10 shrink-0">
-                <div class="flex items-center gap-4 overflow-x-auto no-scrollbar py-2">
-                    <div class="text-xs font-bold text-secondary-600 uppercase whitespace-nowrap px-2 border-r border-gray-200 shrink-0">
-                        Select Target<br>選擇對讀本
+            <div class="bg-white border-b border-gray-200 px-2 md:px-4 py-2 shadow-sm z-10 shrink-0">
+                <div class="flex items-center gap-2 md:gap-4 overflow-x-auto no-scrollbar py-1">
+                    <div class="hidden md:block text-xs font-bold text-secondary-600 uppercase whitespace-nowrap px-2 border-r border-gray-200 shrink-0">
+                        選擇對讀本
                     </div>
                     
                     <button 
                         v-for="target in currentSource.targets" 
                         :key="target.id"
                         @click="selectTarget(target.id)"
-                        :class="['group relative px-4 py-2.5 rounded-xl border text-left transition-all duration-200 min-w-[180px] shrink-0 hover:-translate-y-0.5', 
+                        :class="['group relative px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl border text-left transition-all duration-200 min-w-[140px] md:min-w-[180px] shrink-0', 
                                  currentTargetId === target.id 
                                  ? 'bg-white border-secondary-500 ring-1 ring-secondary-500 shadow-md' 
-                                 : 'bg-white border-gray-200 hover:border-secondary-300 hover:shadow-sm text-gray-500']">
+                                 : 'bg-white border-gray-200 text-gray-500']">
                         
-                        <div class="flex justify-between items-center mb-1.5">
+                        <div class="flex justify-between items-center mb-1">
                             <span :class="['text-xs font-bold', currentTargetId === target.id ? 'text-secondary-700' : 'text-slate-600']">
                                 {{ target.date || target.id }}
                             </span>
-                            <span v-if="target.conf" :class="['w-2 h-2 rounded-full', target.conf === 'H' ? 'bg-red-400' : 'bg-yellow-400']"></span>
+                            <span v-if="target.conf" :class="['w-1.5 h-1.5 md:w-2 md:h-2 rounded-full', target.conf === 'H' ? 'bg-red-400' : 'bg-yellow-400']"></span>
                         </div>
                         
                         <div class="flex gap-2 items-center">
-                            <div class="flex items-center gap-1 text-[10px] font-mono bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded text-slate-500">
-                                <span class="font-bold text-primary-600">K</span>
-                                {{ Number(target.kb_score).toFixed(2) }}
+                            <div class="flex items-center gap-1 text-[10px] font-mono bg-slate-50 border border-slate-100 px-1 py-0.5 rounded text-slate-500">
+                                <span class="font-bold text-primary-600">K</span>{{ Number(target.kb_score).toFixed(2) }}
                             </div>
-                            <div class="flex items-center gap-1 text-[10px] font-mono bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded text-slate-500">
-                                <span class="font-bold text-purple-600">D</span>
-                                {{ Number(target.dense_score).toFixed(2) }}
-                            </div>
-                        </div>
-                        
-                        <div class="absolute -top-2 right-2 bg-gray-100 text-[9px] px-1.5 py-0.5 rounded border border-gray-200 text-gray-500 shadow-sm" v-if="target.type">
-                            {{ target.type }}
                         </div>
                     </button>
                 </div>
             </div>
 
-            <div class="flex-1 flex overflow-hidden p-4 gap-4">
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2 md:p-4 gap-2 md:gap-4">
                 
-                <div class="flex-1 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300">
-                    <div class="px-5 py-3 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white flex justify-between items-center sticky top-0 shrink-0">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-white border border-primary-100 text-primary-600 flex items-center justify-center font-serif font-bold text-lg shadow-sm">明</div>
+                <div class="flex-1 flex flex-col bg-white rounded-xl md:rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="px-3 py-2 md:px-5 md:py-3 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white flex justify-between items-center sticky top-0 shrink-0">
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <div class="w-6 h-6 md:w-8 md:h-8 rounded md:rounded-lg bg-white border border-primary-100 text-primary-600 flex items-center justify-center font-serif font-bold text-sm md:text-lg shadow-sm">明</div>
                             <div>
-                                <div class="text-[10px] text-primary-400 font-bold uppercase tracking-wider">Source Text</div>
-                                <div class="font-bold text-slate-800 text-sm">{{ currentSource.source_date || '無日期' }}</div>
+                                <div class="hidden md:block text-[10px] text-primary-400 font-bold uppercase tracking-wider">Source Text</div>
+                                <div class="font-bold text-slate-800 text-xs md:text-sm truncate max-w-[120px] md:max-w-none">{{ currentSource.source_date || '無日期' }}</div>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono text-slate-300">{{ currentSource.source }}</span>
                     </div>
                     
-                    <div class="flex-1 overflow-y-auto p-6 relative scroll-smooth bg-white" ref="sourcePanel" @scroll="handleScroll('source')">
+                    <div class="flex-1 overflow-y-auto p-4 md:p-6 relative scroll-smooth bg-white" ref="sourcePanel" @scroll="handleScroll('source')">
                         <div class="text-classical text-slate-700">
                             {{ formatText(getText(currentSource.source)) }}
                         </div>
                     </div>
                 </div>
 
-                <div class="flex-1 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden group hover:shadow-md transition-shadow duration-300 relative">
-                    <div class="px-5 py-3 border-b border-gray-100 bg-gradient-to-r from-secondary-50 to-white flex justify-between items-center sticky top-0 shrink-0 z-10">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-white border border-secondary-100 text-secondary-600 flex items-center justify-center font-serif font-bold text-lg shadow-sm">鮮</div>
+                <div class="flex-1 flex flex-col bg-white rounded-xl md:rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="px-3 py-2 md:px-5 md:py-3 border-b border-gray-100 bg-gradient-to-r from-secondary-50 to-white flex justify-between items-center sticky top-0 shrink-0 z-10">
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <div class="w-6 h-6 md:w-8 md:h-8 rounded md:rounded-lg bg-white border border-secondary-100 text-secondary-600 flex items-center justify-center font-serif font-bold text-sm md:text-lg shadow-sm">鮮</div>
                             <div>
-                                <div class="text-[10px] text-secondary-400 font-bold uppercase tracking-wider">Target Text</div>
-                                <div class="font-bold text-slate-800 text-sm">{{ currentTargetObj ? (currentTargetObj.date || currentTargetObj.id) : '--' }}</div>
+                                <div class="hidden md:block text-[10px] text-secondary-400 font-bold uppercase tracking-wider">Target Text</div>
+                                <div class="font-bold text-slate-800 text-xs md:text-sm truncate max-w-[120px] md:max-w-none">{{ currentTargetObj ? (currentTargetObj.date || currentTargetObj.id) : '--' }}</div>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono text-slate-300">{{ currentTargetId || 'N/A' }}</span>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto p-6 relative scroll-smooth bg-white" ref="targetPanel" @scroll="handleScroll('target')">
+                    <div class="flex-1 overflow-y-auto p-4 md:p-6 relative scroll-smooth bg-white" ref="targetPanel" @scroll="handleScroll('target')">
                         
-                        <div v-if="currentTargetObj" class="mb-8">
-                            <div class="grid grid-cols-3 gap-3 mb-4">
-                                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 flex flex-col items-center">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase">KB Similarity</span>
-                                    <span class="text-xl font-mono font-bold text-primary-600 mt-1">
-                                        {{ currentTargetObj.kb_score ? Number(currentTargetObj.kb_score).toFixed(3) : '-' }}
+                        <div v-if="currentTargetObj" class="mb-6">
+                            <div class="grid grid-cols-3 gap-2 mb-3">
+                                <div class="bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center">
+                                    <span class="text-[9px] font-bold text-slate-400">KB</span>
+                                    <span class="text-sm md:text-xl font-mono font-bold text-primary-600">
+                                        {{ currentTargetObj.kb_score ? Number(currentTargetObj.kb_score).toFixed(2) : '-' }}
                                     </span>
                                 </div>
-                                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 flex flex-col items-center">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase">Dense Similarity</span>
-                                    <span class="text-xl font-mono font-bold text-purple-600 mt-1">
-                                        {{ currentTargetObj.dense_score ? Number(currentTargetObj.dense_score).toFixed(3) : '-' }}
+                                <div class="bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center">
+                                    <span class="text-[9px] font-bold text-slate-400">DENSE</span>
+                                    <span class="text-sm md:text-xl font-mono font-bold text-purple-600">
+                                        {{ currentTargetObj.dense_score ? Number(currentTargetObj.dense_score).toFixed(2) : '-' }}
                                     </span>
                                 </div>
-                                <div :class="['rounded-xl p-3 border flex flex-col items-center', 
+                                <div :class="['rounded-lg p-2 border flex flex-col items-center', 
                                     currentTargetObj.conf === 'H' ? 'bg-red-50 border-red-100' : 'bg-amber-50 border-amber-100']">
-                                    <span :class="['text-[10px] font-bold uppercase', currentTargetObj.conf === 'H' ? 'text-red-400' : 'text-amber-400']">Confidence</span>
-                                    <span :class="['text-xl font-bold mt-1', currentTargetObj.conf === 'H' ? 'text-red-600' : 'text-amber-600']">
+                                    <span :class="['text-[9px] font-bold uppercase', currentTargetObj.conf === 'H' ? 'text-red-400' : 'text-amber-400']">CONF</span>
+                                    <span :class="['text-sm md:text-xl font-bold', currentTargetObj.conf === 'H' ? 'text-red-600' : 'text-amber-600']">
                                         {{ currentTargetObj.conf || '-' }}
                                     </span>
                                 </div>
                             </div>
 
-                            <div v-if="currentTargetObj.reason" class="relative bg-gradient-to-br from-orange-50 to-orange-50/20 border border-orange-100 rounded-2xl p-4 shadow-sm">
-                                <div class="absolute top-0 left-0 -mt-2 ml-4 bg-white text-orange-600 text-[10px] font-bold px-2 py-0.5 rounded border border-orange-100 shadow-sm uppercase tracking-wide">
-                                    AI Reasoning
-                                </div>
-                                <p class="text-sm text-slate-700 leading-relaxed pt-2 font-serif opacity-90">
+                            <div v-if="currentTargetObj.reason" class="relative bg-orange-50/50 border border-orange-100 rounded-lg p-3 mb-4">
+                                <p class="text-xs md:text-sm text-slate-700 leading-relaxed font-serif opacity-90">
+                                    <span class="text-orange-600 font-bold mr-1">AI:</span>
                                     {{ currentTargetObj.reason }}
                                 </p>
                             </div>
@@ -239,11 +238,8 @@
                             {{ formatText(getText(currentTargetId)) }}
                         </div>
                         
-                        <div v-else class="h-64 flex items-center justify-center flex-col gap-3 text-slate-300">
-                             <div class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                             </div>
-                            <span class="text-sm">請從上方選擇一個對讀目標</span>
+                        <div v-else class="h-32 md:h-64 flex items-center justify-center flex-col gap-3 text-slate-300">
+                             <span class="text-sm">請選擇對讀目標</span>
                         </div>
                     </div>
                 </div>
@@ -251,22 +247,18 @@
             </div>
         </main>
 
-        <div v-else class="flex-1 flex items-center justify-center bg-gray-50 flex-col gap-6 p-8 text-center">
-            <div class="relative w-24 h-24">
+        <div v-else class="flex-1 flex items-center justify-center bg-gray-50 flex-col gap-4 md:gap-6 p-8 text-center">
+            <div class="relative w-16 h-16 md:w-24 md:h-24">
                 <div class="absolute inset-0 bg-primary-100 rounded-full animate-ping opacity-20"></div>
-                <div class="relative bg-white p-6 rounded-full shadow-xl border border-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="relative bg-white p-4 md:p-6 rounded-full shadow-xl border border-gray-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 md:h-12 md:w-12 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                 </div>
             </div>
-            <div class="max-w-md">
-                <h2 class="text-2xl font-bold text-slate-800 mb-2 font-serif">歡迎使用對讀系統</h2>
-                <p class="text-slate-500 mb-6 leading-relaxed">請從左側側邊欄選擇年份與記事，系統將自動提取相關聯的《朝鮮王朝實錄》段落進行比對。</p>
-                <div class="inline-flex gap-2 text-xs font-mono text-slate-400 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
-                    <span>💡 Tip:</span>
-                    <span>支援滾動同步與自動排版</span>
-                </div>
+            <div class="max-w-xs md:max-w-md">
+                <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-2 font-serif">歡迎使用對讀系統</h2>
+                <p class="text-sm md:text-base text-slate-500 mb-6 leading-relaxed">請點擊左上角選單，選擇年份與記事。</p>
             </div>
         </div>
     </div>
@@ -279,6 +271,7 @@
         data() {
             return {
                 loading: true,
+                sidebarOpen: false, // 控制手機版側邊欄
                 mappings: [],
                 corpus: {},
                 currentSource: null,
@@ -338,6 +331,7 @@
                 } else {
                     this.currentTargetId = null;
                 }
+                this.sidebarOpen = false; // 手機版選擇後自動收起側邊欄
                 this.resetScroll();
             },
             selectTarget(tid) {
