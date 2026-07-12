@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>文獻對讀系統 V3.7 (Type Added)</title>
+    <title>文獻對讀系統 V3.9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             theme: {
@@ -27,17 +27,17 @@
 
     <style>
         body { background-color: #f3f4f6; }
-        
+
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .text-classical {
             font-family: "Noto Serif TC", serif;
-            font-size: 1.1rem;
+            font-size: 1rem;
             line-height: 1.8;
             text-align: justify;
             letter-spacing: 0.02em;
@@ -45,52 +45,73 @@
         }
 
         @media (max-width: 768px) {
-            .text-classical { font-size: 1.05rem; line-height: 1.7; }
+            .text-classical { font-size: 0.75rem; line-height: 1.5; }
         }
     </style>
 </head>
 <body class="text-slate-600">
 
 <div id="app" class="h-screen h-[100dvh] flex flex-col overflow-hidden bg-gray-50">
-    
+
     <header class="bg-white/90 backdrop-blur-md border-b border-gray-200 h-14 md:h-16 flex items-center px-4 md:px-6 justify-between shrink-0 z-40 sticky top-0 shadow-sm">
-        <div class="flex items-center gap-3 md:gap-4">
-            <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 -ml-2 text-slate-500 hover:bg-gray-100 rounded-lg">
+        <div class="flex items-center gap-3 md:gap-6">
+            <button v-show="currentView === 'reader'" @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 -ml-2 text-slate-500 hover:bg-gray-100 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
 
-            <div class="bg-gradient-to-br from-primary-600 to-primary-800 text-white p-1.5 md:p-2 rounded-lg shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-            </div>
-            <div>
-                <h1 class="text-base md:text-lg font-bold text-slate-800 tracking-wide">壬辰戰爭對讀</h1>
-                <div class="hidden md:block text-[10px] text-slate-400 font-mono flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                    v3.7 Type
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="bg-gradient-to-br from-primary-600 to-primary-800 text-white p-1.5 md:p-2 rounded-lg shadow-md hidden md:block">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                </div>
+                <div>
+                    <h1 class="text-base md:text-lg font-bold text-slate-800 tracking-wide">{{ t.header.title }}</h1>
+                    <div class="hidden md:flex text-[10px] text-slate-400 font-mono items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        v3.9
+                    </div>
                 </div>
             </div>
+
+            <nav class="hidden md:flex items-center ml-4 gap-1 bg-gray-100/50 p-1 rounded-lg border border-gray-200">
+                <button @click="currentView = 'reader'" :class="['px-4 py-1.5 text-sm font-medium rounded-md transition-colors', currentView === 'reader' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-gray-100']">{{ t.nav.reader }}</button>
+                <button @click="currentView = 'guide'" :class="['px-4 py-1.5 text-sm font-medium rounded-md transition-colors', currentView === 'guide' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-gray-100']">{{ t.nav.guide }}</button>
+                <button @click="currentView = 'about'" :class="['px-4 py-1.5 text-sm font-medium rounded-md transition-colors', currentView === 'about' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-gray-100']">{{ t.nav.about }}</button>
+            </nav>
         </div>
-        
-        <div class="flex items-center gap-2 md:gap-4 bg-gray-100/50 p-1 md:p-1.5 rounded-full border border-gray-200">
-             <label class="hidden md:flex items-center cursor-pointer gap-2 text-xs font-medium text-slate-600 px-3 py-1">
-                <input type="checkbox" v-model="cleanMode" class="accent-primary-600 rounded">
-                <span>自動清理</span>
-            </label>
-             <label class="flex items-center cursor-pointer gap-2 text-xs font-medium text-slate-600 px-3 py-1">
-                <input type="checkbox" v-model="syncScroll" class="accent-primary-600 rounded">
-                <span class="whitespace-nowrap">同步</span>
-            </label>
+
+        <div class="flex items-center gap-2 md:gap-3">
+            <div class="flex items-center gap-0.5 bg-gray-100/50 p-1 rounded-lg border border-gray-200">
+                <button @click="currentLang = 'zh'" :class="['px-2 py-1 text-xs font-bold rounded-md transition-colors', currentLang === 'zh' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-400 hover:text-slate-600']">中</button>
+                <button @click="currentLang = 'en'" :class="['px-2 py-1 text-xs font-bold rounded-md transition-colors', currentLang === 'en' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-400 hover:text-slate-600']">EN</button>
+                <button @click="currentLang = 'ko'" :class="['px-2 py-1 text-xs font-bold rounded-md transition-colors', currentLang === 'ko' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-400 hover:text-slate-600']">한</button>
+            </div>
+
+            <select v-model="currentView" class="md:hidden bg-gray-50 border border-gray-200 text-slate-700 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-1.5">
+                <option value="reader">{{ t.nav.reader }}</option>
+                <option value="guide">{{ t.nav.guide }}</option>
+                <option value="about">{{ t.nav.about }}</option>
+            </select>
+
+            <div v-show="currentView === 'reader'" class="flex items-center gap-2 md:gap-4 bg-gray-100/50 p-1 md:p-1.5 rounded-full border border-gray-200">
+                 <label class="hidden md:flex items-center cursor-pointer gap-2 text-xs font-medium text-slate-600 px-3 py-1">
+                    <input type="checkbox" v-model="cleanMode" class="accent-primary-600 rounded">
+                    <span>{{ t.header.cleanMode }}</span>
+                </label>
+                 <label class="flex items-center cursor-pointer gap-2 text-xs font-medium text-slate-600 px-3 py-1">
+                    <input type="checkbox" v-model="syncScroll" class="accent-primary-600 rounded">
+                    <span class="whitespace-nowrap">{{ t.header.sync }}</span>
+                </label>
+            </div>
         </div>
     </header>
 
-    <div class="flex-1 flex overflow-hidden relative">
-        
+    <div v-if="currentView === 'reader'" class="flex-1 flex overflow-hidden relative">
         <div v-if="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-black/30 z-30 md:hidden transition-opacity"></div>
         <aside :class="['absolute md:relative z-40 h-full w-72 md:w-80 bg-white border-r border-gray-200 flex flex-col shadow-2xl md:shadow-[4px_0_24px_-12px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out', sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0']">
             <div class="p-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">明實錄編年索引</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">{{ t.header.sidebarTitle }}</h3>
                 <button @click="sidebarOpen = false" class="md:hidden text-slate-400 hover:text-slate-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                 </button>
@@ -102,24 +123,24 @@
                             <span :class="['w-5 h-5 flex items-center justify-center mr-2 rounded text-[10px] transition-colors', expandedYears[year] ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-400 group-hover:bg-white']">
                                 {{ expandedYears[year] ? '▼' : '▶' }}
                             </span>
-                            {{ year }} 年 
+                            {{ year }}{{ t.reader.yearSuffix }}
                             <span class="ml-auto text-[10px] font-mono bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full border border-gray-200">
                                 {{ group.length }}
                             </span>
                         </button>
                         <ul v-show="expandedYears[year]" class="mt-1 ml-3 border-l-2 border-dashed border-gray-200 pl-3 py-1 space-y-1">
                             <li v-for="(item, index) in group" :key="item.source">
-                                <button 
+                                <button
                                     @click="selectSource(item)"
-                                    :class="['w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-[3px]', 
-                                             currentSource && currentSource.source === item.source 
-                                             ? 'bg-primary-50 border-primary-500 text-primary-900 shadow-sm' 
+                                    :class="['w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 border-l-[3px]',
+                                             currentSource && currentSource.source === item.source
+                                             ? 'bg-primary-50 border-primary-500 text-primary-900 shadow-sm'
                                              : 'bg-transparent border-transparent text-slate-500 hover:text-slate-800 hover:bg-gray-50']">
                                     <div class="flex justify-between items-baseline">
                                         <span class="font-bold tracking-tight">{{ item.source_date || item.source }}</span>
                                     </div>
                                     <div class="text-[10px] mt-1 font-mono opacity-60 flex justify-between">
-                                        <span>{{ item.source }}</span>
+                                        <span>ID {{ item.source }}</span>
                                         <span v-if="item.targets.length" class="text-primary-600 font-bold">{{ item.targets.length }}</span>
                                     </div>
                                 </button>
@@ -134,32 +155,32 @@
         </aside>
 
         <main class="flex-1 flex flex-col min-w-0 bg-gray-50/50" v-if="currentSource">
-            
             <div class="bg-white border-b border-gray-200 px-2 md:px-4 py-2 shadow-sm z-10 shrink-0">
                 <div class="flex items-center gap-2 md:gap-4 overflow-x-auto no-scrollbar py-1">
                     <div class="hidden md:block text-xs font-bold text-secondary-600 uppercase whitespace-nowrap px-2 border-r border-gray-200 shrink-0">
-                        選擇對讀本
+                        {{ t.reader.selectFor }}
                     </div>
-                    <button 
-                        v-for="target in currentSource.targets" 
+                    <button
+                        v-for="target in currentSource.targets"
                         :key="target.id"
                         @click="selectTarget(target.id)"
-                        :class="['group relative px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl border text-left transition-all duration-200 min-w-[140px] md:min-w-[180px] shrink-0', 
-                                 currentTargetId === target.id 
-                                 ? 'bg-white border-secondary-500 ring-1 ring-secondary-500 shadow-md' 
+                        :class="['group relative px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl border text-left transition-all duration-200 min-w-[140px] md:min-w-[180px] shrink-0',
+                                 currentTargetId === target.id
+                                 ? 'bg-white border-secondary-500 ring-1 ring-secondary-500 shadow-md'
                                  : 'bg-white border-gray-200 text-gray-500']">
                         <div class="flex justify-between items-center mb-1">
                             <span :class="['text-xs font-bold', currentTargetId === target.id ? 'text-secondary-700' : 'text-slate-600']">
                                 {{ target.date || target.id }}
                             </span>
-                            <span v-if="target.conf" :class="['w-1.5 h-1.5 md:w-2 md:h-2 rounded-full', target.conf === 'H' ? 'bg-red-400' : 'bg-yellow-400']"></span>
+                            <span v-if="target.conf" :class="['w-1.5 h-1.5 md:w-2 md:h-2 rounded-full', target.conf === 'H' ? 'bg-red-400' : target.conf === 'M' ? 'bg-yellow-400' : target.conf === 'L' ? 'bg-slate-400' : 'bg-slate-300']"></span>
                         </div>
                         <div class="flex gap-2 items-center">
                             <div class="flex items-center gap-1 text-[10px] font-mono bg-slate-50 border border-slate-100 px-1 py-0.5 rounded text-slate-500">
-                                <span class="font-bold text-slate-400">T</span>{{ target.type || '-' }}
+                                <span class="font-bold text-slate-400">TYPE</span>{{ target.type || '-' }}
                             </div>
                             <div class="flex items-center gap-1 text-[10px] font-mono bg-slate-50 border border-slate-100 px-1 py-0.5 rounded text-slate-500">
-                                <span class="font-bold text-primary-600">K</span>{{ formatScore(target.kb_score) }}
+                                <span class="text-[9px] font-bold text-slate-400 tracking-wider">CONF</span>
+                                <span :class="['font-bold font-mono', target.conf === 'H' ? 'text-red-500' : target.conf === 'M' ? 'text-yellow-500' : target.conf === 'L' ? 'text-slate-500' : 'text-slate-400']">{{ target.conf || '-' }}</span>
                             </div>
                         </div>
                     </button>
@@ -167,13 +188,12 @@
             </div>
 
             <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-2 md:p-4 gap-2 md:gap-4">
-                
                 <div class="flex-1 flex flex-col bg-white rounded-xl md:rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div class="px-3 py-2 md:px-5 md:py-3 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white flex justify-between items-center sticky top-0 shrink-0">
                         <div class="flex items-center gap-2 md:gap-3">
                             <div class="w-6 h-6 md:w-8 md:h-8 rounded md:rounded-lg bg-white border border-primary-100 text-primary-600 flex items-center justify-center font-serif font-bold text-sm md:text-lg shadow-sm">明</div>
                             <div>
-                                <div class="font-bold text-slate-800 text-xs md:text-sm truncate max-w-[200px] md:max-w-none">{{ currentSource.source_date || '無日期' }}</div>
+                                <div class="font-bold text-slate-800 text-xs md:text-sm truncate max-w-[200px] md:max-w-none">{{ currentSource.source_date || t.reader.noDate }}</div>
                             </div>
                         </div>
                     </div>
@@ -185,7 +205,7 @@
                 </div>
 
                 <div class="flex-1 flex flex-col bg-white rounded-xl md:rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="px-3 py-2 md:px-5 md:py-3 border-b border-gray-100 bg-gradient-to-r from-secondary-50 to-white flex justify-between items-center sticky top-0 shrink-0 z-10">
+                    <div class="px-3 py-2 md:px-5 md:py-3 border-b border-gray-100 bg-gradient-to-r from-secondary-50 to-white flex justify-between items-center shrink-0 z-10">
                         <div class="flex items-center gap-2 md:gap-3">
                             <div class="w-6 h-6 md:w-8 md:h-8 rounded md:rounded-lg bg-white border border-secondary-100 text-secondary-600 flex items-center justify-center font-serif font-bold text-sm md:text-lg shadow-sm">鮮</div>
                             <div>
@@ -194,69 +214,49 @@
                         </div>
                     </div>
 
+                    <div v-if="currentTargetObj" class="border-b border-gray-100 px-4 py-3 bg-white shrink-0 z-10">
+                        <div class="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-4 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <span class="text-[9px] font-bold text-slate-400 tracking-wider">TYPE</span>
+                                <span class="text-sm md:text-lg font-mono font-bold text-slate-700">{{ currentTargetObj.type || '-' }}</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center">
+                                <span class="text-[9px] font-bold text-slate-400 tracking-wider">CONF</span>
+                                <span :class="['text-sm md:text-lg font-bold', currentTargetObj.conf === 'H' ? 'text-red-600' : 'text-amber-500']">{{ currentTargetObj.conf || '-' }}</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center">
+                                <span class="text-[9px] font-bold text-slate-400 tracking-wider">2-GRAM</span>
+                                <span class="text-sm md:text-lg font-mono font-bold text-sky-600">{{ formatScore(currentTargetObj.gram_2) }}</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center">
+                                <span class="text-[9px] font-bold text-slate-400 tracking-wider">3-GRAM</span>
+                                <span class="text-sm md:text-lg font-mono font-bold text-sky-600">{{ formatScore(currentTargetObj.gram_3) }}</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center">
+                                <span class="text-[9px] font-bold text-slate-400 tracking-wider">DENSE</span>
+                                <span class="text-sm md:text-lg font-mono font-bold text-sky-600">{{ formatScore(currentTargetObj.dense_score) }}</span>
+                            </div>
+                            <div class="flex flex-col items-center justify-center">
+                                <span class="text-[9px] font-bold text-slate-400 tracking-wider">KB</span>
+                                <span class="text-sm md:text-lg font-mono font-bold text-sky-600">{{ formatScore(currentTargetObj.kb_score) }}</span>
+                            </div>
+                        </div>
+                        <div v-if="currentTargetObj.reason" class="mt-3 pt-2 border-t border-dashed border-gray-200">
+                            <p class="text-xs leading-relaxed truncate">
+                                <span class="text-slate-500 font-bold mr-1">AI Reasoning:</span>
+                                <span class="text-black">{{ currentTargetObj.reason }}</span>
+                            </p>
+                        </div>
+                    </div>
+
                     <div class="flex-1 overflow-y-auto p-4 md:p-6 relative scroll-smooth bg-white" ref="targetPanel" @scroll="handleScroll('target')">
-                        
-                        <div v-if="currentTargetObj" class="mb-6">
-                            <div class="grid grid-cols-3 md:grid-cols-6 gap-2 mb-3">
-                                
-                                <div class="bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center">
-                                    <span class="text-[9px] font-bold text-slate-400">TYPE</span>
-                                    <span class="text-sm md:text-lg font-mono font-bold text-slate-600">
-                                        {{ currentTargetObj.type || '-' }}
-                                    </span>
-                                </div>
-
-                                <div class="bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center">
-                                    <span class="text-[9px] font-bold text-slate-400">KB</span>
-                                    <span class="text-sm md:text-lg font-mono font-bold text-primary-600">
-                                        {{ formatScore(currentTargetObj.kb_score) }}
-                                    </span>
-                                </div>
-                                
-                                <div class="bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center">
-                                    <span class="text-[9px] font-bold text-slate-400">DENSE</span>
-                                    <span class="text-sm md:text-lg font-mono font-bold text-purple-600">
-                                        {{ formatScore(currentTargetObj.dense_score) }}
-                                    </span>
-                                </div>
-                                
-                                <div class="bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center">
-                                    <span class="text-[9px] font-bold text-slate-400">2-GRAM</span>
-                                    <span class="text-sm md:text-lg font-mono font-bold text-sky-600">
-                                        {{ formatScore(currentTargetObj.gram_2) }}
-                                    </span>
-                                </div>
-                                
-                                <div class="bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center">
-                                    <span class="text-[9px] font-bold text-slate-400">3-GRAM</span>
-                                    <span class="text-sm md:text-lg font-mono font-bold text-sky-600">
-                                        {{ formatScore(currentTargetObj.gram_3) }}
-                                    </span>
-                                </div>
-                                
-                                <div :class="['rounded-lg p-2 border flex flex-col items-center', 
-                                    currentTargetObj.conf === 'H' ? 'bg-red-50 border-red-100' : 'bg-amber-50 border-amber-100']">
-                                    <span :class="['text-[9px] font-bold uppercase', currentTargetObj.conf === 'H' ? 'text-red-400' : 'text-amber-400']">CONF</span>
-                                    <span :class="['text-sm md:text-lg font-bold', currentTargetObj.conf === 'H' ? 'text-red-600' : 'text-amber-600']">
-                                        {{ currentTargetObj.conf || '-' }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div v-if="currentTargetObj.reason" class="relative bg-orange-50/50 border border-orange-100 rounded-lg p-3 mb-4">
-                                <p class="text-xs md:text-sm text-slate-700 leading-relaxed font-serif opacity-90">
-                                    <span class="text-orange-600 font-bold mr-1">AI Reasoning:</span>
-                                    {{ currentTargetObj.reason }}
-                                </p>
+                        <div v-if="currentTargetObj">
+                            <div class="text-classical text-slate-700 pb-12" v-if="currentTargetId">
+                                {{ formatText(getText(currentTargetId)) }}
                             </div>
                         </div>
-
-                        <div class="text-classical text-slate-700 pb-12" v-if="currentTargetId">
-                            {{ formatText(getText(currentTargetId)) }}
-                        </div>
-                        
                         <div v-else class="h-32 md:h-64 flex items-center justify-center flex-col gap-3 text-slate-300">
-                             <span class="text-sm">請選擇對讀目標</span>
+                             <span class="text-sm">{{ t.reader.pleaseSelect }}</span>
                         </div>
                     </div>
                 </div>
@@ -273,32 +273,485 @@
                 </div>
             </div>
             <div class="max-w-xs md:max-w-md">
-                <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-2 font-serif">歡迎使用對讀系統</h2>
-                <p class="text-sm md:text-base text-slate-500 mb-6 leading-relaxed">請點擊左上角選單，選擇年份與記事。</p>
+                <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-2 font-serif">{{ t.reader.welcomeTitle }}</h2>
+                <p class="text-sm md:text-base text-slate-500 mb-6 leading-relaxed">{{ t.reader.welcomeText }}</p>
             </div>
         </div>
+    </div>
+    <div v-else-if="currentView === 'guide'" class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8 lg:p-12">
+        <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+
+            <div class="bg-gradient-to-br from-primary-600 to-primary-800 px-8 py-10 md:py-14 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-serif tracking-wide">{{ t.guide.title }}</h2>
+                <p class="text-primary-100 text-sm md:text-base max-w-2xl mx-auto">
+                    {{ t.guide.subtitle }}
+                </p>
+            </div>
+
+            <div class="p-8 md:p-12 space-y-12 text-slate-700">
+                <section>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-6 font-serif border-l-4 border-primary-500 pl-4">{{ t.guide.section1.heading }}</h3>
+                    <p class="mb-6 text-slate-600">{{ t.guide.section1.intro }}</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div v-for="type in t.guide.section1.types" :key="type.tag" class="bg-slate-50 rounded-xl p-6 border border-gray-100">
+                            <div class="text-primary-600 font-mono font-bold text-sm mb-2 bg-primary-50 inline-block px-2 py-1 rounded">{{ type.tag }}</div>
+                            <h4 class="text-lg font-bold text-slate-800 mb-3">{{ type.title }}</h4>
+                            <p class="text-sm text-slate-600 mb-3"><span class="font-bold text-slate-700">{{ type.defLabel }}</span>{{ type.def }}</p>
+                            <p class="text-sm text-slate-600"><span class="font-bold text-slate-700">{{ type.keyLabel }}</span>{{ type.key }}</p>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="border-gray-100">
+
+                <section>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-6 font-serif border-l-4 border-secondary-500 pl-4">{{ t.guide.section2.heading }}</h3>
+                    <p class="mb-8 text-slate-600">{{ t.guide.section2.intro }}</p>
+
+                    <div class="space-y-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-secondary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                                {{ t.guide.section2.quant.heading }}
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4">{{ t.guide.section2.quant.intro }}</p>
+                            <ul class="space-y-3 pl-4">
+                                <li v-for="item in t.guide.section2.quant.items" :key="item.label" class="flex items-start">
+                                    <span class="text-secondary-500 mr-2 mt-0.5">▪</span>
+                                    <div><span class="font-bold text-slate-700">{{ item.label }}</span> {{ item.text }}</div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-secondary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                                {{ t.guide.section2.qual.heading }}
+                            </h4>
+                            <p class="text-sm text-slate-500 mb-4">{{ t.guide.section2.qual.intro }}</p>
+                            <ul class="space-y-3 pl-4">
+                                <li v-for="item in t.guide.section2.qual.items" :key="item.label" class="flex items-start">
+                                    <span class="text-secondary-500 mr-2 mt-0.5">▪</span>
+                                    <div><span class="font-bold text-slate-700">{{ item.label }}</span> {{ item.text }}</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="border-gray-100">
+
+                <section class="bg-amber-50 rounded-xl p-6 md:p-8 border border-amber-100">
+                    <h3 class="text-xl font-bold text-amber-900 mb-4 font-serif">{{ t.guide.howto.heading }}</h3>
+                    <ul class="space-y-4">
+                        <li v-for="(item, idx) in t.guide.howto.items" :key="item.label" class="flex items-start">
+                            <div class="bg-amber-200 text-amber-800 w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm shrink-0 mt-0.5 mr-3">{{ idx + 1 }}</div>
+                            <div><span class="font-bold text-amber-900">{{ item.label }}</span> {{ item.text }}</div>
+                        </li>
+                    </ul>
+                </section>
+
+            </div>
+        </div>
+        <div class="h-12"></div>
+    </div>
+
+
+    <div v-else-if="currentView === 'about'" class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8 lg:p-12">
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 px-8 py-12 md:py-16 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-serif tracking-wide">{{ t.about.title }}</h2>
+                <p class="text-slate-300 text-sm md:text-base max-w-2xl mx-auto">
+                    {{ t.about.tagline }}
+                </p>
+            </div>
+
+            <div class="p-8 md:p-12 space-y-10 text-slate-700 leading-relaxed text-justify">
+
+                <section v-for="sec in [t.about.background, t.about.overview, t.about.coretech, t.about.significance]" :key="sec.heading">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 font-serif">{{ sec.heading }}</h3>
+                    <p v-for="(p, i) in sec.paragraphs" :key="i" class="mb-4 indent-8 last:mb-0">{{ p }}</p>
+                    <ul v-if="sec.bullets" class="space-y-2 mt-4 pl-4">
+                        <li v-for="b in sec.bullets" :key="b.label" class="flex items-start text-sm">
+                            <span class="text-primary-500 mr-2 mt-0.5">▪</span>
+                            <div><span class="font-bold text-slate-700">{{ b.label }}</span> {{ b.text }}</div>
+                        </li>
+                    </ul>
+                </section>
+
+                <hr class="border-gray-100">
+
+                <section>
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 font-serif flex items-center gap-2">
+                        <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                        {{ t.about.referencesHeading }}
+                    </h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="https://openmuseum.tw/muse/exhibition/663f239cc46c7136af0da95a63087b78#front" target="_blank" class="flex items-center p-3 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors group">
+                                <span class="font-medium text-slate-800 group-hover:text-primary-700">{{ t.about.references[0] }}</span>
+                                <svg class="w-4 h-4 ml-auto text-slate-400 group-hover:text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" target="_blank" class="flex items-center p-3 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors group">
+                                <span class="font-medium text-slate-800 group-hover:text-primary-700">{{ t.about.references[1] }}</span>
+                                <svg class="w-4 h-4 ml-auto text-slate-400 group-hover:text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" target="_blank" class="flex items-center p-3 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors group">
+                                <span class="font-medium text-slate-800 group-hover:text-primary-700">{{ t.about.references[2] }}</span>
+                                <svg class="w-4 h-4 ml-auto text-slate-400 group-hover:text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+
+                <hr class="border-gray-100">
+
+                <section>
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 font-serif flex items-center gap-2">
+                        <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        {{ t.about.teamHeading }}
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div v-for="m in t.about.team" :key="m.name" class="p-4 rounded-xl bg-gray-50 border border-gray-100 flex flex-col">
+                            <span class="text-sm font-bold text-primary-600 mb-1">{{ m.role }}</span>
+                            <span class="text-lg font-bold text-slate-800">{{ m.name }}</span>
+                            <span class="text-xs text-slate-500 mt-1">{{ m.org }}</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="bg-slate-50 border-t border-gray-200 p-6 text-center">
+                <p class="text-xs text-slate-500 font-mono">
+                    {{ t.about.footer }}
+                </p>
+            </div>
+        </div>
+        <div class="h-12"></div>
     </div>
 </div>
 
 <script>
     const { createApp } = Vue
 
+    const translations = {
+        zh: {
+            nav: { reader: '對讀系統', guide: '使用指南', about: '計畫簡介' },
+            header: { title: '壬辰戰爭對讀', sidebarTitle: '明實錄編年索引', cleanMode: '自動清理', sync: '同步' },
+            reader: {
+                selectFor: '選擇對讀本', pleaseSelect: '請選擇對讀目標',
+                welcomeTitle: '歡迎使用對讀系統', welcomeText: '請點擊左側選單，選擇年份與記事。',
+                noDate: '無日期', yearSuffix: ' 年'
+            },
+            guide: {
+                title: '網站使用指南',
+                subtitle: '本站提供「三種對讀類型」與「五大判讀依據」，輔助研究者進行深度的歷史文獻比對。',
+                section1: {
+                    heading: '1. 對讀三類型 (Three Types of Alignment)',
+                    intro: '系統根據史料間的關聯性質，將對讀結果分為以下三類：',
+                    types: [
+                        { tag: 'TYPE 1', title: '文獻傳遞', defLabel: '定義：', def: '同一份文件（如公文、奏疏、咨文）在明朝與朝鮮兩方流轉並各自記載。', keyLabel: '判斷重點：', key: '內容高度相似或文字重合度高。' },
+                        { tag: 'TYPE 2', title: '平行記錄', defLabel: '定義：', def: '兩方各自從不同視角記錄同一歷史事件。', keyLabel: '判斷重點：', key: '核心事實（人物、時間、地點、事件）相符，但敘述方式或詳略程度有所不同。' },
+                        { tag: 'TYPE 3', title: '連續記錄', defLabel: '定義：', def: '具有時序或因果關係的前後相關事件序列。', keyLabel: '判斷重點：', key: '存在明確的連鎖關係（如：命令→執行、請求→回應、原因→結果、批准→謝恩等）。' }
+                    ]
+                },
+                section2: {
+                    heading: '2. 五大判讀依據',
+                    intro: '為確保 AI 判斷的可解釋性，系統針對每一組對讀結果提供定量與定性的分析數據：',
+                    quant: {
+                        heading: '定量依據 (Quantitative Basis)',
+                        intro: '基於數據計算的客觀一致性指標，反映文本與結構的相似度。',
+                        items: [
+                            { label: '統計比對 (2-GRAM/3-GRAM)：', text: '提供 Bigram / Trigram 數值，顯示詞彙重疊程度。' },
+                            { label: '語義比對 (DENSE)：', text: '透過向量模型分析，即便用詞不同也能識別語義的親疏。' },
+                            { label: '知識庫結構比對 (KB)：', text: '比對知識庫中人物、地點等實體節點的結構關聯性。' }
+                        ]
+                    },
+                    qual: {
+                        heading: '定性依據 (Qualitative Basis)',
+                        intro: '由大型語言模型 (LLM) 進行深層脈絡判斷後提供的分析結果。',
+                        items: [
+                            { label: '信賴度 (CONF)：', text: '分為 H (High) / M (Medium) / L (Low) 三級，反映系統對類型判斷的把握程度（介面以顏色區分）。' },
+                            { label: '大型語言模型推理 (AI Reasoning)：', text: '由 AI 以 8 字左右的簡短文字，說明判定該對讀類型的核心理由（如：「明廷褒獎內容一致」）。' }
+                        ]
+                    }
+                },
+                howto: {
+                    heading: '💡 研究者如何使用？',
+                    items: [
+                        { label: '高效篩選：', text: '優先查看信賴度為 H (紅色/顯著顏色) 的紀錄。' },
+                        { label: '深度比對：', text: '利用定量依據確認文本的物理相似度，再參考定性依據理解 AI 的邏輯推論。' },
+                        { label: '最終判讀：', text: '系統提供的數據僅作為參考依據，最終的歷史意義解讀與事實確認仍由研究者本於專業進行。' }
+                    ]
+                }
+            },
+            about: {
+                title: '計畫簡介',
+                tagline: 'AI串聯《明實錄》與《朝鮮王朝實錄》，研究者還原壬辰戰爭的歷史。',
+                background: {
+                    heading: '研究背景',
+                    paragraphs: [
+                        '1592年至1598年間的壬辰戰爭（萬曆朝鮮之役）深刻改變了東亞的歷史軌跡。當時處於戰爭核心的明朝與朝鮮王朝，分別在各自的官修史籍——《明實錄》與《朝鮮王朝實錄》中留下了詳盡的記錄，兩部史籍至今仍是理解此役最核心的一手史料。',
+                        '然而，兩部史籍篇幅極其浩繁，且皆以漢文撰寫。若僅憑人力找出記載同一事件的對應段落進行比對，實為一項極具挑戰性的工程。'
+                    ]
+                },
+                overview: {
+                    heading: '計劃概述',
+                    paragraphs: [
+                        '本計畫〈利用 GraphRAG 和文本對齊模型構建壬辰戰爭對讀資料庫：對明實錄與朝鮮王朝實錄的創新研究〉，即是為了突破此學術難題而發起。作為中央研究院人文社會科學研究中心（地理資訊科學研究專題中心）114年度數位人文研究計畫的研究成果，本案於 2025 年 1 月至 12 月期間，在中央研究院數位文化中心的資助與支持下進行開發。'
+                    ]
+                },
+                coretech: {
+                    heading: '核心技術：Imjin War-Align 框架',
+                    paragraphs: [
+                        '本計畫的核心，在於建置「壬辰戰爭跨文本對讀資料庫」，並研發整合 GraphRAG 與大型語言模型（LLM）的「Imjin War-Align」框架。此系統利用 AI 的事件提取與關聯推理能力，將兩國史料中具備深層語義關聯的段落進行對齊，形成跨越明朝與朝鮮兩部官修史籍的對讀資料庫。',
+                        '為輔助研究者判讀，資料庫提供兩個層次的依據：'
+                    ],
+                    bullets: [
+                        { label: '定量依據：', text: 'N-gram 比對、語義相似度（Sparse/Dense Retrieval）、知識庫結構（KB）相似度' },
+                        { label: '定性依據：', text: '大型語言模型之推理結果、對齊理由及信賴度（Confidence）評估' }
+                    ]
+                },
+                significance: {
+                    heading: '研究意義 — 人機協作的新典範',
+                    paragraphs: [
+                        '本計畫所提出的，不僅是一套檢索工具。AI 作為橫跨浩繁史料的強大助手，而史料的最終判讀與歷史意義之發掘，則交由研究者親自完成。在數位人文領域樹立「人機協作」的正確典範，正是本計畫所追求的終極目標。'
+                    ]
+                },
+                referencesHeading: '參考資料',
+                references: ['開放博物館展覽 (中文 / 英文)', 'GitHub（研究開源資料，準備中）', '網站使用方法 (PDF說明)'],
+                teamHeading: '團隊介紹',
+                team: [
+                    { role: '研究員', name: '蔡宗翰', org: '中央研究院人文社會科學研究中心 GIS 專題中心' },
+                    { role: '助理教授', name: '王昱鈞', org: '法鼓文理學院佛教學系' },
+                    { role: '博士後研究員', name: '崔至延', org: '中央研究院人文社會科學研究中心 GIS 專題中心' },
+                    { role: '研究助理', name: '吳俊鍇', org: '中央研究院人文社會科學研究中心 GIS 專題中心' },
+                    { role: '碩士生', name: '施采廷', org: '國立中央大學資訊工程學系' }
+                ],
+                footer: '© 2025 中央研究院 地理資訊科學研究專題中心 All rights reserved.'
+            }
+        },
+        en: {
+            nav: { reader: 'Reading System', guide: 'Site Guide', about: 'About the Project' },
+            header: { title: 'Imjin War Parallel-Text', sidebarTitle: 'Ming Shilu Chronological Index', cleanMode: 'Auto Clean', sync: 'Sync' },
+            reader: {
+                selectFor: 'Select for Comparison', pleaseSelect: 'Please select a comparison target',
+                welcomeTitle: 'Welcome to the Reading System', welcomeText: 'Please click the menu on the left to select a year and entry.',
+                noDate: 'No Date', yearSuffix: ''
+            },
+            guide: {
+                title: 'Site Guide',
+                subtitle: 'This site offers three alignment types and five analytical indicators to support researchers in conducting in-depth comparisons of historical sources.',
+                section1: {
+                    heading: '1. Three Types of Alignment',
+                    intro: 'The system classifies each alignment result into one of the following three categories based on the nature of the relationship between the sources.',
+                    types: [
+                        { tag: 'TYPE 1', title: 'Document Transmission', defLabel: 'Definition: ', def: 'The same document (e.g., an official dispatch, memorial, or diplomatic letter) circulated between the Ming and Joseon courts and was recorded by each side.', keyLabel: 'Key criterion: ', key: 'High textual overlap or near-identical content.' },
+                        { tag: 'TYPE 2', title: 'Parallel Recording', defLabel: 'Definition: ', def: 'Both sides independently recorded the same historical event from their respective perspectives.', keyLabel: 'Key criterion: ', key: 'Core facts (persons, time, place, and event) align, but the accounts differ in narrative style or level of detail.' },
+                        { tag: 'TYPE 3', title: 'Sequential Recording', defLabel: 'Definition: ', def: 'A series of related events connected by temporal or causal relationships.', keyLabel: 'Key criterion: ', key: 'A clear chain of dependency is present — such as order→execution, request→response, cause→effect, or approval→acknowledgment.' }
+                    ]
+                },
+                section2: {
+                    heading: '2. Five Analytical Indicators',
+                    intro: 'To ensure the interpretability of AI-generated judgments, the system provides both quantitative and qualitative analytical data for each alignment result.',
+                    quant: {
+                        heading: 'Quantitative Basis',
+                        intro: 'Objective consistency metrics derived from data computation, reflecting textual and structural similarity.',
+                        items: [
+                            { label: 'Statistical Comparison (2-GRAM/3-GRAM):', text: 'Bigram and Trigram scores indicating the degree of lexical overlap between passages.' },
+                            { label: 'Semantic Comparison (DENSE):', text: 'Vector-based analysis that captures semantic similarity even when surface wording differs.' },
+                            { label: 'Knowledge Base Structural Comparison (KB):', text: 'Comparison of structural relationships between entity nodes — such as persons and places — within the knowledge base.' }
+                        ]
+                    },
+                    qual: {
+                        heading: 'Qualitative Basis',
+                        intro: 'Analytical outputs generated by a large language model (LLM) through deep contextual reasoning.',
+                        items: [
+                            { label: 'Confidence (CONF):', text: "Rated on a three-tier scale — H (High) / M (Medium) / L (Low) — indicating the system's degree of certainty in its type classification (color-coded in the interface)." },
+                            { label: 'AI Reasoning:', text: 'A concise phrase (about eight characters in the original Chinese) in which the AI states the primary reason for its alignment judgment (e.g., "Consistent commendation from the Ming court").' }
+                        ]
+                    }
+                },
+                howto: {
+                    heading: '💡 How to Use This Site',
+                    items: [
+                        { label: 'Efficient filtering:', text: 'Start by reviewing records marked with Confidence H.' },
+                        { label: 'In-depth comparison:', text: "Use the quantitative indicators to assess textual similarity, then consult the qualitative indicators to understand the AI's reasoning." },
+                        { label: 'Final interpretation:', text: 'The data provided by the system is intended as reference material only. The interpretation of historical significance and the verification of facts remain the responsibility of the researcher.' }
+                    ]
+                }
+            },
+            about: {
+                title: 'About the Project',
+                tagline: 'The Ming Shilu and Joseon Wangjo Sillok, bridged by AI — history of the Imjin War, completed by the researcher.',
+                background: {
+                    heading: 'Background',
+                    paragraphs: [
+                        'The Imjin War (1592–1598) was an international conflict among Ming China, Joseon Korea, and Japan that fundamentally reshaped the course of East Asian history. The Ming dynasty and the Joseon — the two powers at the heart of the war — each left detailed accounts in their official dynastic histories, the Ming Shilu (明實錄) and the Joseon Wangjo Sillok (朝鮮王朝實錄), which remain the principal primary sources for understanding the realities of the conflict.',
+                        'However, both works are enormous in scale and written entirely in classical Chinese, making it an extraordinarily demanding task to manually locate and compare corresponding passages that describe the same events.'
+                    ]
+                },
+                overview: {
+                    heading: 'Project Overview',
+                    paragraphs: [
+                        'This project, officially titled "Constructing a Comparative Database of the Imjin War (1592–1598) Using GraphRAG and Text Alignment Models: An Innovative Study of the Veritable Records of the Ming Dynasty and the Annals of the Joseon Dynasty," was launched to address precisely this challenge. It is an outcome of the 2025 Digital Humanities Research Program at the GIS Research Center, Research Center for Humanities and Social Sciences, Academia Sinica (Taiwan), developed from January to December 2025 with the support of the Digital Cultures Center, Academia Sinica.'
+                    ]
+                },
+                coretech: {
+                    heading: 'Core Technology: The Imjin War-Align Framework',
+                    paragraphs: [
+                        "At the heart of the project is the Imjin War-Align framework — an integrated system combining GraphRAG and large language models (LLMs). The framework leverages AI's capabilities in event extraction and relational reasoning to align passages with deep semantic correspondence across the two historical sources, thereby constructing the Imjin War Parallel-Text Database.",
+                        'To support researchers in their final assessment, the database provides evidence at two levels:'
+                    ],
+                    bullets: [
+                        { label: 'Quantitative evidence:', text: 'N-gram overlap, semantic similarity (sparse/dense retrieval), and knowledge-base structural similarity' },
+                        { label: 'Qualitative evidence:', text: 'LLM reasoning outputs, rationale for each alignment, and a confidence assessment' }
+                    ]
+                },
+                significance: {
+                    heading: 'Significance — A New Model of Human–AI Collaboration',
+                    paragraphs: [
+                        'What this project proposes is more than a search tool. AI serves as a powerful assistant traversing vast historical corpora, while the ultimate interpretation of the sources and the discovery of their historical meaning remain firmly in the hands of the researcher. Establishing a sound paradigm for human–AI collaboration in the digital humanities is the ultimate goal this project pursues.'
+                    ]
+                },
+                referencesHeading: 'References',
+                references: ['Open Museum Exhibition (Chinese / English)', 'GitHub (open research data, coming soon)', 'Site Guide (PDF)'],
+                teamHeading: 'Research Team',
+                team: [
+                    { role: 'Research Fellow', name: 'Richard Tzong-Han Tsai', org: 'Center for GIS, Research Center for Humanities and Social Sciences, Academia Sinica' },
+                    { role: 'Assistant Professor', name: 'Yu-Chun Wang', org: 'Department of Buddhist Studies, Dharma Drum Institute of Liberal Arts' },
+                    { role: 'Postdoctoral Researcher', name: 'Jiyeon Choi', org: 'Center for GIS, Research Center for Humanities and Social Sciences, Academia Sinica' },
+                    { role: 'Research Assistant', name: 'Chun-Kai Wu', org: 'Center for GIS, Research Center for Humanities and Social Sciences, Academia Sinica' },
+                    { role: "Master's Student", name: 'Tsai-Ting Shih', org: 'Department of Computer Science and Information Engineering, National Central University' }
+                ],
+                footer: '© 2025 Center for GIS, Academia Sinica. All rights reserved.'
+            }
+        },
+        ko: {
+            nav: { reader: '대조 시스템', guide: '이용 안내', about: '프로젝트 소개' },
+            header: { title: '임진왜란 대조', sidebarTitle: '명실록 연대순 색인', cleanMode: '자동 정리', sync: '동기화' },
+            reader: {
+                selectFor: '대조본 선택', pleaseSelect: '대조 대상을 선택하세요',
+                welcomeTitle: '대조 시스템에 오신 것을 환영합니다', welcomeText: '왼쪽 메뉴를 클릭하여 연도와 기록을 선택하세요.',
+                noDate: '날짜 없음', yearSuffix: '년'
+            },
+            guide: {
+                title: '웹사이트 이용 안내',
+                subtitle: "본 사이트는 '세 가지 대조 유형'과 '다섯 가지 판독 근거'를 제공하여, 연구자가 역사 문헌을 심층적으로 비교 분석할 수 있도록 지원합니다.",
+                section1: {
+                    heading: '1. 대조의 세 가지 유형',
+                    intro: '시스템은 사료 간 관계의 성격에 따라 대조 결과를 다음 세 가지로 분류합니다.',
+                    types: [
+                        { tag: 'TYPE 1', title: '문서 전달', defLabel: '정의: ', def: '동일한 문서(공문, 상소문, 자문 등)가 명과 조선 양측에 유통되어 각각 기록된 경우.', keyLabel: '판단 기준: ', key: '내용이 고도로 유사하거나 문자 일치도가 높음.' },
+                        { tag: 'TYPE 2', title: '병행 기록', defLabel: '정의: ', def: '양측이 서로 다른 시각에서 동일한 역사적 사건을 각각 기록한 경우.', keyLabel: '판단 기준: ', key: '인물·시간·장소·사건 등 핵심 사실은 일치하나, 서술 방식이나 상세도에 차이가 있음.' },
+                        { tag: 'TYPE 3', title: '연속 기록', defLabel: '정의: ', def: '시간적 또는 인과적 관계로 연결된 일련의 사건 기록.', keyLabel: '판단 기준: ', key: '명령→실행, 요청→응답, 원인→결과, 승인→사은 등 명확한 상관관계가 존재함.' }
+                    ]
+                },
+                section2: {
+                    heading: '2. 다섯 가지 판독 근거',
+                    intro: 'AI 판단의 해석 가능성을 높이기 위해, 시스템은 각 대조 결과에 대해 정량적·정성적 분석 데이터를 함께 제공합니다.',
+                    quant: {
+                        heading: '정량적 근거',
+                        intro: '데이터 계산에 기반한 객관적 일치도 지표로, 텍스트 및 구조의 유사도를 반영합니다.',
+                        items: [
+                            { label: '통계 비교 (2-GRAM/3-GRAM):', text: 'Bigram / Trigram 수치로 어휘 중복 정도를 확인합니다.' },
+                            { label: '의미 비교 (DENSE):', text: '벡터 모델 분석을 통해, 표현이 달라도 의미적 유사성을 파악합니다.' },
+                            { label: '지식 베이스 구조 비교 (KB):', text: '지식 베이스 내 인물·장소 등 개체 노드 간의 구조적 연관성을 비교합니다.' }
+                        ]
+                    },
+                    qual: {
+                        heading: '정성적 근거',
+                        intro: '대형 언어 모델(LLM)이 맥락을 심층 분석한 결과를 바탕으로 제공됩니다.',
+                        items: [
+                            { label: '신뢰도 (CONF):', text: 'H(높음) / M(보통) / L(낮음) 세 단계로 구분되며, 시스템의 유형 판단에 대한 확신 정도를 나타냅니다. (인터페이스에서 색상으로 구분)' },
+                            { label: '대형 언어 모델 추론 (AI Reasoning):', text: 'AI가 해당 대조 유형으로 판정한 핵심 이유를 8자(한문 기준) 내외의 간결한 문구로 제시합니다. (예: "明廷褒獎內容一致" — 명 조정의 포상 내용이 일치함)' }
+                        ]
+                    }
+                },
+                howto: {
+                    heading: '💡 연구자를 위한 활용 가이드',
+                    items: [
+                        { label: '효율적 탐색:', text: '신뢰도 H로 표시된 기록을 우선 확인하세요.' },
+                        { label: '심층 비교:', text: '정량적 근거로 텍스트의 물리적 유사도를 확인한 후, 정성적 근거를 통해 AI의 논리적 판단을 참고하세요.' },
+                        { label: '최종 판독:', text: '시스템이 제공하는 데이터는 어디까지나 참고 자료입니다. 역사적 의미의 해석과 사실 확인은 최종적으로 연구자의 전문적 판단에 의해 이루어져야 합니다.' }
+                    ]
+                }
+            },
+            about: {
+                title: '프로젝트 소개',
+                tagline: 'AI가 이어주는 《명실록》과 《조선왕조실록》, 연구자가 완성하는 임진왜란의 역사.',
+                background: {
+                    heading: '연구 배경',
+                    paragraphs: [
+                        '임진왜란(1592–1598)은 명·조선·일본 세 나라가 얽힌 국제 전쟁으로, 동아시아 역사의 흐름을 크게 바꾸어 놓은 사건입니다. 당시 전쟁의 중심에 있었던 명과 조선은 각국의 관찬 사서인 《명실록(明實錄)》과 《조선왕조실록(朝鮮王朝實錄)》에 그 과정을 상세히 기록으로 남겼으며, 두 사서는 오늘날까지 임진왜란 연구의 핵심 사료로 평가받습니다.',
+                        '하지만 두 사서는 분량이 방대할 뿐 아니라 고전 한문으로 쓰여 있어, 동일한 사건이 양국 기록에 어떻게 달리 서술되었는지를 일일이 대조·분석하는 것은 현대 연구자에게도 매우 부담이 큰 작업입니다.'
+                    ]
+                },
+                overview: {
+                    heading: '프로젝트 개요',
+                    paragraphs: [
+                        "본 프로젝트 〈GraphRAG와 텍스트 정렬 모델을 활용한 임진왜란 사료 대조 데이터베이스 구축: 명실록과 조선왕조실록을 중심으로〉는 이러한 어려움을 AI를 활용하여 해결하고자 수행되었습니다. 본 프로젝트는 대만 중앙연구원 인문사회과학연구센터(GIS 연구센터)의 2025년도 디지털인문학 연구 과제의 성과이며, 중앙연구원 디지털문화센터의 지원 아래 2025년 1월부터 12월까지 수행되었습니다."
+                    ]
+                },
+                coretech: {
+                    heading: '핵심 기술: Imjin War-Align 프레임워크',
+                    paragraphs: [
+                        "본 프로젝트는 GraphRAG와 대형 언어 모델(LLM)을 결합한 'Imjin War-Align' 프레임워크를 개발하였습니다. 이 프레임워크는 AI의 사건 추출 및 관계 추론 능력을 활용하여 《명실록》과 《조선왕조실록》에서 의미적으로 대응되는 구절을 추출하고, 두 사료를 아우르는 '임진왜란 사료 대조 데이터베이스'를 구축합니다.",
+                        '연구자의 최종 판단을 돕기 위해 데이터베이스는 두 층위의 근거를 함께 제공합니다.'
+                    ],
+                    bullets: [
+                        { label: '정량적 근거:', text: 'N-gram 일치도, 의미 유사도(Sparse/Dense Retrieval), 지식 베이스 구조 유사도' },
+                        { label: '정성적 근거:', text: 'LLM의 추론 결과와 각 대응 구절에 대한 판단 근거 및 신뢰도(Confidence) 평가' }
+                    ]
+                },
+                significance: {
+                    heading: '연구의 의의 — 인간-AI 협업의 새로운 모델',
+                    paragraphs: [
+                        "본 프로젝트가 제안하는 것은 단순한 검색 도구가 아닙니다. AI는 방대한 사료를 가로지르는 강력한 보조자로 기능하되, 사료에 대한 최종 해석과 역사적 의미의 발굴은 연구자의 몫으로 남깁니다. 디지털인문학 분야에서 '인간-AI 협업의 바람직한 방향성'을 제시하는 것, 이것이 본 프로젝트가 지향하는 궁극의 목표입니다."
+                    ]
+                },
+                referencesHeading: '참고 자료',
+                references: ['온라인 전시 (중국어/영어)', 'GitHub (오픈 리서치 데이터, 준비 중)', '사이트 가이드 (PDF)'],
+                teamHeading: '연구팀',
+                team: [
+                    { role: '연구원', name: '차이종한(蔡宗翰)', org: '중앙연구원 인문사회과학연구센터 GIS 연구센터' },
+                    { role: '조교수', name: '왕위쥔(王昱鈞)', org: '법고문리대학(法鼓文理學院) 불교학과' },
+                    { role: '박사후연구원', name: '최지연', org: '중앙연구원 인문사회과학연구센터 GIS 연구센터' },
+                    { role: '연구조교', name: '우준카이(吳俊鍇)', org: '중앙연구원 인문사회과학연구센터 GIS 연구센터' },
+                    { role: '석사과정', name: '스차이팅(施采廷)', org: '국립중앙대학(國立中央大學) 정보공학과' }
+                ],
+                footer: '© 2025 중앙연구원 지리정보과학 연구센터. All rights reserved.'
+            }
+        }
+    };
+
     createApp({
         data() {
             return {
+                currentView: 'reader', // 控制當前顯示頁面 ('reader', 'guide', 'about')
+                currentLang: 'zh', // 'zh' | 'en' | 'ko'
                 loading: true,
-                sidebarOpen: false, 
+                sidebarOpen: false,
                 mappings: [],
                 corpus: {},
                 currentSource: null,
                 currentTargetId: null,
                 syncScroll: true,
                 cleanMode: true,
-                expandedYears: {}, 
+                expandedYears: {},
                 isScrolling: false
             }
         },
         computed: {
+            t() {
+                return translations[this.currentLang];
+            },
             groupedMappings() {
                 const groups = {};
                 this.mappings.forEach(item => {
@@ -320,8 +773,12 @@
                 return this.currentSource.targets.find(t => t.id === this.currentTargetId);
             }
         },
+        watch: {
+            currentLang(val) {
+                document.documentElement.lang = val === 'zh' ? 'zh-TW' : val === 'ko' ? 'ko' : 'en';
+            }
+        },
         mounted() {
-            // 🔴 請確認檔名
             fetch('./data_LAST2.json')
                 .then(response => response.json())
                 .then(data => {
@@ -377,7 +834,7 @@
                 if (!this.syncScroll) return;
                 if (this.isScrolling) return;
                 this.isScrolling = true;
-                
+
                 const source = this.$refs.sourcePanel;
                 const target = this.$refs.targetPanel;
 
